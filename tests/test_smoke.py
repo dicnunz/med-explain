@@ -1,5 +1,4 @@
 import importlib
-import pytest
 
 @pytest.mark.parametrize("mod", ["app", "summary"])
 def test_import(mod):
