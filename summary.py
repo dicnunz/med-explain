@@ -25,7 +25,7 @@ def main(argv: Optional[List[str]] = None) -> None:
         argv = sys.argv[1:]
 
     if len(argv) != 1:
-        print("[red]Usage:[/] python summary.py <file.pdf>")
+        sys.stderr.write("[red]Usage:[/] python summary.py <file.pdf>\n")
         sys.exit(1)
 
     pdf_path = argv[0]
