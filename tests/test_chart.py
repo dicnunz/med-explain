@@ -19,8 +19,9 @@ def test_build_lab_chart():
     res = parse_lab_results(sample)
     fig = build_lab_chart(res)
     try:
-        import matplotlib # noqa: F401
+        import matplotlib  # noqa: F401
         from matplotlib.figure import Figure
+
         assert isinstance(fig, Figure)
     except ImportError:
         assert fig is None
