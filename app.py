@@ -4,6 +4,7 @@ from PyPDF2 import PdfReader
 import re
 from wordfreq import zipf_frequency
 from duckduckgo_search import DDGS
+from lab_utils import parse_lab_results, build_lab_chart
 
 st.title("Med-Explain 📄➡️🧠")
 
@@ -61,3 +62,12 @@ if pdf_file:
         st.subheader("Summary")
         summary_text = textwrap.fill(resp["message"]["content"], 80)
         st.markdown(with_tooltips(summary_text), unsafe_allow_html=True)
+
+        # ---- Detect simple lab result tables ---------------------------------
+        lab_results = parse_lab_results(text)
+        if lab_results:
+            st.subheader("Lab Results")
+            st.write(lab_results)
+            fig = build_lab_chart(lab_results)
+            if fig:
+                st.pyplot(fig)
