@@ -19,13 +19,15 @@ if "history" not in st.session_state:
 
 st.title("Med-Explain 📄➡️🧠")
 
+# ─────────────────── Sidebar History ───────────────────────────────────────
 summary_html = None
-if st.session_state.history:
-    names = [
-        f"{i + 1}. {item['name']}" for i, item in enumerate(st.session_state.history)
-    ]  # noqa: E501
+names = [f"{i + 1}. {item['name']}" for i, item in enumerate(st.session_state.history)]
+if names:  # only draw the radio once we have at least one upload
     choice = st.sidebar.radio(
-        "History", names, index=st.session_state.selected or 0, key="history_radio"
+        "History",
+        names,
+        index=st.session_state.selected or 0,
+        key="history_radio",
     )
     st.session_state.selected = names.index(choice)
     summary_html = st.session_state.history[st.session_state.selected]["summary"]
@@ -60,7 +62,10 @@ if pdf_file:
                 defs: dict[str, str] = {}
                 with DDGS() as ddgs:
                     for w in common:
-                        hits = ddgs.text(f"{w} medical definition", max_results=1)
+                        hits = ddgs.text(
+                            f'"{w}" definition site:nih.gov OR site:medlineplus.gov',
+                            max_results=1,
+                        )
                         if hits:
                             body = hits[0].get("body") or hits[0].get("snippet") or ""
                             defs[w] = body.split(".")[0] + "..."
