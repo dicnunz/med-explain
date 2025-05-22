@@ -21,7 +21,9 @@ st.title("Med-Explain 📄➡️🧠")
 
 summary_html = None
 if st.session_state.history:
-    names = [f"{i+1}. {item['name']}" for i, item in enumerate(st.session_state.history)] # noqa: E501
+    names = [
+        f"{i + 1}. {item['name']}" for i, item in enumerate(st.session_state.history)
+    ]  # noqa: E501
     choice = st.sidebar.radio(
         "History", names, index=st.session_state.selected or 0, key="history_radio"
     )
