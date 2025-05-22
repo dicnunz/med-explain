@@ -2,7 +2,6 @@ import sys
 import textwrap
 from typing import List, Optional
 
-from rich import print
 import ollama
 from loader import load_text
 
