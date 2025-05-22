@@ -3,7 +3,6 @@ import textwrap
 from typing import List, Optional
 
 from rich import print
-from PyPDF2 import PdfReader
 import ollama
 
 from loader import load_text
