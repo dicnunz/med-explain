@@ -3,7 +3,6 @@ import textwrap
 from typing import List, Optional
 
 import ollama
-
 from loader import load_text
 
 
@@ -20,19 +19,21 @@ def summarize(text: str) -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> None:
+    """CLI entry point — safe to import."""
     if argv is None:
         argv = sys.argv[1:]
 
     if len(argv) != 1:
-        print("[red]Usage:[/] python summary.py <file.pdf>")
+        sys.stderr.write("[red]Usage:[/] python summary.py <file.pdf>\n")
         sys.exit(1)
 
     pdf_path = argv[0]
     text = load_text(pdf_path)[:12_000]
     result = summarize(text)
 
-    print("\n[bold green]Summary:[/]\n")
-    print(textwrap.fill(result, 80))
+    # Write the model summary only (no raw PDF text)
+    sys.stdout.write("\nSummary:\n\n")
+    sys.stdout.write(textwrap.fill(result, 80) + "\n")
 
 
 if __name__ == "__main__":  # pragma: no cover
