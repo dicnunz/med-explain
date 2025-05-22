@@ -1,13 +1,13 @@
-import streamlit as st
-import ollama, textwrap
-import ollama
-import textwrap
-from PyPDF2 import PdfReader
-master
 import re
-from wordfreq import zipf_frequency
-from duckduckgo_search import DDGS
+import textwrap
 from tempfile import NamedTemporaryFile
+from typing import Dict
+
+import streamlit as st
+from PyPDF2 import PdfReader
+from duckduckgo_search import DDGS
+from wordfreq import zipf_frequency
+
 from loader import load_text
 
 st.title("Med-Explain 📄➡️🧠")
