@@ -10,9 +10,11 @@ from PIL import Image
 
 PathLike = Union[str, bytes, Path]
 
+
 def _extract_with_pypdf2(path: PathLike) -> str:
     reader = PdfReader(path)
     return " ".join(page.extract_text() or "" for page in reader.pages)
+
 
 def _extract_with_ocr(path: PathLike) -> str:
     doc = fitz.open(path)
@@ -23,6 +25,7 @@ def _extract_with_ocr(path: PathLike) -> str:
         texts.append(pytesseract.image_to_string(img))
     doc.close()
     return "\n".join(texts)
+
 
 def load_text(path: PathLike) -> str:
     text = _extract_with_pypdf2(path)

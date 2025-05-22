@@ -23,10 +23,10 @@ def create_empty_pdf(path):
 
 
 def create_scanned_pdf(path, text):
-    img = Image.new('RGB', (400, 200), color='white')
+    img = Image.new("RGB", (400, 200), color="white")
     draw = ImageDraw.Draw(img)
-    draw.text((50, 80), text, fill='black')
-    img_path = path.with_suffix('.png')
+    draw.text((50, 80), text, fill="black")
+    img_path = path.with_suffix(".png")
     img.save(img_path)
     doc = fitz.open()
     page = doc.new_page(width=400, height=200)
