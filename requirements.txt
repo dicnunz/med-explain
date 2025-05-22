@@ -6,3 +6,5 @@ wordfreq
 pytesseract
 pymupdf
 pytest
+matplotlib
+rich
