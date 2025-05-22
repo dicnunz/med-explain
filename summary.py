@@ -1,17 +1,9 @@
-import sys, textwrap
-from PyPDF2 import PdfReader
-import ollama
-
-if len(sys.argv) != 2:
-    sys.stderr.write("Usage: python summary.py <file.pdf>\n")
-    sys.exit(1)
 import sys
 import textwrap
 from typing import List, Optional
 
 from rich import print
 import ollama
-
 from loader import load_text
 
 
@@ -28,6 +20,7 @@ def summarize(text: str) -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> None:
+    """CLI entry point — safe to import."""
     if argv is None:
         argv = sys.argv[1:]
 
@@ -39,12 +32,10 @@ def main(argv: Optional[List[str]] = None) -> None:
     text = load_text(pdf_path)[:12_000]
     result = summarize(text)
 
-    print("\n[bold green]Summary:[/]\n")
-    print(textwrap.fill(result, 80))
+    # Write the model summary only (no raw PDF text)
+    sys.stdout.write("\nSummary:\n\n")
+    sys.stdout.write(textwrap.fill(result, 80) + "\n")
 
-
-sys.stdout.write("\nSummary:\n\n")
-sys.stdout.write(textwrap.fill(resp["message"]["content"], 80) + "\n")
 
 if __name__ == "__main__":  # pragma: no cover
     main()
