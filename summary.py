@@ -2,15 +2,10 @@ import sys
 import textwrap
 from typing import List, Optional
 
-from PyPDF2 import PdfReader
-import ollama
 from rich import print
+import ollama
 
-
-def load_text(pdf_path: str) -> str:
-    """Extract up to 12 000 chars of text from a PDF."""
-    reader = PdfReader(pdf_path)
-    return " ".join(page.extract_text() or "" for page in reader.pages)[:12000]
+from loader import load_text
 
 
 def summarize(text: str) -> str:
@@ -26,7 +21,6 @@ def summarize(text: str) -> str:
 
 
 def main(argv: Optional[List[str]] = None) -> None:
-    """Entry point for CLI usage."""
     if argv is None:
         argv = sys.argv[1:]
 
@@ -35,12 +29,12 @@ def main(argv: Optional[List[str]] = None) -> None:
         sys.exit(1)
 
     pdf_path = argv[0]
-    text = load_text(pdf_path)
+    text = load_text(pdf_path)[:12_000]
     result = summarize(text)
 
     print("\n[bold green]Summary:[/]\n")
     print(textwrap.fill(result, 80))
 
 
-if __name__ == "__main__":  # pragma: no cover – direct execution
+if __name__ == "__main__":  # pragma: no cover
     main()

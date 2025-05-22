@@ -1,17 +1,22 @@
+import re
+import textwrap
+from tempfile import NamedTemporaryFile
+
 import streamlit as st
 import ollama
-import textwrap
-from PyPDF2 import PdfReader
-import re
-from wordfreq import zipf_frequency
 from duckduckgo_search import DDGS
+from wordfreq import zipf_frequency
+
+from loader import load_text
 
 st.title("Med-Explain 📄➡️🧠")
 
 pdf_file = st.file_uploader("Upload a medical PDF", type="pdf")
 if pdf_file:
-    reader = PdfReader(pdf_file)
-    text = " ".join(page.extract_text() or "" for page in reader.pages)[:12000]
+    with NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(pdf_file.read())
+        tmp_path = tmp.name
+    text = load_text(tmp_path)[:12000]
     # ---- Identify likely medical jargon ----------------------------------
     words = re.findall(r"[A-Za-z]{6,}", text.lower())  # 6+ letters
     counts = {}
