@@ -1,10 +1,9 @@
 import re
 import textwrap
 from tempfile import NamedTemporaryFile
-from typing import Dict
 
 import streamlit as st
-from PyPDF2 import PdfReader
+import ollama
 from duckduckgo_search import DDGS
 from wordfreq import zipf_frequency
 
