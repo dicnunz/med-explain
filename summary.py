@@ -1,12 +1,11 @@
-import sys, textwrap
 import sys
 import textwrap
 from typing import List, Optional
 
-from PyPDF2 import PdfReader
-master
-import ollama
 from rich import print
+from PyPDF2 import PdfReader
+import ollama
+
 from loader import load_text
 
 
@@ -42,7 +41,6 @@ def main(argv: Optional[List[str]] = None) -> None:
     pdf_path = argv[0]
     text = load_text(pdf_path)
     result = summarize(text)
-    master
 
     print("\n[bold green]Summary:[/]\n")
     print(textwrap.fill(result, 80))
