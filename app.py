@@ -60,14 +60,10 @@ if pdf_file:
                 defs: dict[str, str] = {}
                 with DDGS() as ddgs:
                     for w in common:
-                        try:
-                            res = next(
-                                ddgs.text(f"{w} medical definition", max_results=1)
-                            )
-                            body = res.get("body") or res.get("snippet") or ""
-                            defs[w] = body.split(".")[0] + "…"
-                        except StopIteration:
-                            pass
+                        hits = ddgs.text(f"{w} medical definition", max_results=1)
+                        if hits:
+                            body = hits[0].get("body") or hits[0].get("snippet") or ""
+                            defs[w] = body.split(".")[0] + "..."
                 return defs
 
             glossary = build_glossary(text)
