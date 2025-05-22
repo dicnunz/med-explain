@@ -2,7 +2,6 @@ import os
 import sys
 import fitz
 from PIL import Image, ImageDraw
-import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from loader import load_text
