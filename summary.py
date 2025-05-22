@@ -1,10 +1,9 @@
 import sys, textwrap
 from PyPDF2 import PdfReader
 import ollama
-from rich import print
 
 if len(sys.argv) != 2:
-    print("[red]Usage:[/] python summary.py <file.pdf>")
+    sys.stderr.write("Usage: python summary.py <file.pdf>\n")
     sys.exit(1)
 
 pdf_path = sys.argv[1]
@@ -21,5 +20,5 @@ resp = ollama.chat(
     messages=[{"role": "user", "content": prompt}],
 )
 
-print("\n[bold green]Summary:[/]\n")
-print(textwrap.fill(resp["message"]["content"], 80))
+sys.stdout.write("\nSummary:\n\n")
+sys.stdout.write(textwrap.fill(resp["message"]["content"], 80) + "\n")
