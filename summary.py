@@ -1,4 +1,5 @@
-import sys, textwrap
+import sys
+import textwrap
 from PyPDF2 import PdfReader
 import ollama
 from rich import print
@@ -8,8 +9,8 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 pdf_path = sys.argv[1]
-reader   = PdfReader(pdf_path)
-text     = " ".join(page.extract_text() or "" for page in reader.pages)[:12000]
+reader = PdfReader(pdf_path)
+text = " ".join(page.extract_text() or "" for page in reader.pages)[:12000]
 
 prompt = (
     "Explain the following medical document in 200 words or less so a "
