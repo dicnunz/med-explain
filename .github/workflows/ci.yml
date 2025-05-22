@@ -10,22 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+
       - name: Cache pip
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: ${{ runner.os }}-pip-
+
       - name: Install tesseract
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+
       - name: Install dependencies
         run: pip install -r requirements.txt
+
       - name: Add repo to PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
       - name: Run tests
         run: |
           pytest -vv || if [ $? -eq 5 ]; then echo "No tests to run — skipping"; else exit $?; fi
