@@ -1,0 +1,8 @@
+PyPDF2
+streamlit
+ollama
+duckduckgo-search
+wordfreq
+pytesseract
+pymupdf
+pytest
