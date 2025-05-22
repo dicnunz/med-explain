@@ -14,8 +14,9 @@ NORMAL_RANGES = {
 def parse_lab_results(text: str) -> Dict[str, float]:
     """Extract simple lab results like ``"HDL 45 mg/dL"`` from ``text``."""
     pattern = re.compile(
-        r"([A-Za-z][A-Za-z0-9 ]+)\s+(\d+(?:\.\d+)?)\s*(mg/dL|g/dL|mmol/L|%)", re.I
-    )  # noqa: E501
+        r"\b([A-Za-z][A-Za-z0-9 ]+?)\s+(\d+(?:\.\d+)?)\s*(mg/dL|g/dL|mmol/L|%)",
+        re.I,
+    )
     results: Dict[str, float] = {}
     for name, value, _ in re.findall(pattern, text):
         try:
