@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Optional
+from typing import Dict
 
 # some typical reference ranges (lower, upper)
 NORMAL_RANGES = {
