@@ -1,5 +1,4 @@
 import streamlit as st
-codex/add-ocr-handling-with-loader.py
 import ollama, textwrap
 import ollama
 import textwrap
