@@ -1,4 +1,3 @@
-codex/add-ocr-handling-with-loader.py
 import sys, textwrap
 import sys
 import textwrap
@@ -11,7 +10,6 @@ from rich import print
 from loader import load_text
 
 
-codex/add-ocr-handling-with-loader.py
 pdf_path = sys.argv[1]
 text = load_text(pdf_path)[:12000]
 def load_text(pdf_path: str) -> str:
