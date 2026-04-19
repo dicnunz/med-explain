@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "master"]
   pull_request:
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
       - name: Cache pip
         uses: actions/cache@v3
@@ -56,4 +56,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -vv || if [ $? -eq 5 ]; then echo "No tests to run — skipping"; else exit $?; fi
+          python -m pytest -vv

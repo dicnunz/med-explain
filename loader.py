@@ -7,7 +7,6 @@ import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
 
-
 PathLike = Union[str, bytes, Path]
 
 

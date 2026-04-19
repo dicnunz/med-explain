@@ -6,7 +6,6 @@ from jsonschema import validate
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from fhir import build_diagnostic_report
 
-
 # Minimal schema fragment for DiagnosticReport
 SCHEMA = {
     "type": "object",

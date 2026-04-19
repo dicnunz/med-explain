@@ -31,6 +31,9 @@ def build_lab_chart(results: Dict[str, float]):
 
     If matplotlib is not available, returns ``None``.
     """
+    if not results:
+        return None
+
     try:
         import matplotlib.pyplot as plt
     except Exception:
@@ -38,9 +41,18 @@ def build_lab_chart(results: Dict[str, float]):
 
     names = list(results.keys())
     values = [results[n] for n in names]
+    colors = []
+    for name in names:
+        if name in NORMAL_RANGES:
+            low, high = NORMAL_RANGES[name]
+            colors.append(
+                "#dc2626" if results[name] < low or results[name] > high else "#2563eb"
+            )
+        else:
+            colors.append("#2563eb")
 
     fig, ax = plt.subplots()
-    ax.bar(names, values, color="skyblue")
+    ax.bar(names, values, color=colors)
 
     for i, name in enumerate(names):
         if name in NORMAL_RANGES:
@@ -48,7 +60,7 @@ def build_lab_chart(results: Dict[str, float]):
             ax.axhspan(low, high, color="green", alpha=0.2)
 
     ax.set_ylabel("Value")
-    ax.set_title("Lab Results")
+    ax.set_title("Detected Lab Results vs Reference Range")
     plt.xticks(rotation=45, ha="right")
     fig.tight_layout()
     return fig

@@ -1,112 +1,181 @@
-import re
-import textwrap
+import hashlib
+import json
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List
 
 import streamlit as st
-import ollama
-from duckduckgo_search import DDGS
-from wordfreq import zipf_frequency
 
+from explain import (
+    DEFAULT_MODEL,
+    extract_repeated_medical_terms,
+    normalize_definition_snippet,
+    render_summary_html,
+    request_summary,
+)
+from fhir import build_diagnostic_report
 from loader import load_text
-from lab_utils import build_lab_chart
+from lab_utils import build_lab_chart, parse_lab_results
+
+st.set_page_config(page_title="Med Explain", page_icon="🩺")
 
 # ─────────────────── Session & sidebar history ──────────────────────────────
 if "history" not in st.session_state:
     st.session_state.history: List[dict] = []
     st.session_state.selected: int | None = None
-    st.session_state.last_file: str | None = None
 
-st.title("Med-Explain 📄➡️🧠")
+st.title("Med Explain")
+st.caption(
+    "Local-first medical PDF explanations with OCR fallback, optional glossary "
+    "tooltips, lab charting, and FHIR JSON export."
+)
+st.caption(
+    "Educational summary only. This app does not diagnose, treat, or replace "
+    "a clinician."
+)
+
+
+def build_public_glossary(source_text: str, max_terms: int = 12) -> dict[str, str]:
+    from duckduckgo_search import DDGS
+
+    definitions: dict[str, str] = {}
+    with DDGS() as ddgs:
+        for term in extract_repeated_medical_terms(source_text, max_terms=max_terms):
+            hits = ddgs.text(
+                f'"{term}" definition site:nih.gov OR site:medlineplus.gov',
+                max_results=1,
+            )
+            if not hits:
+                continue
+
+            raw_snippet = hits[0].get("body") or hits[0].get("snippet") or ""
+            snippet = normalize_definition_snippet(raw_snippet)
+            if snippet:
+                definitions[term] = snippet
+
+    return definitions
+
+
+def build_history_record(
+    file_name: str,
+    file_digest: str,
+    source_text: str,
+    glossary_enabled: bool,
+) -> tuple[dict, str | None]:
+    summary_text = request_summary(source_text)
+    glossary: dict[str, str] = {}
+    glossary_warning = None
+    if glossary_enabled:
+        try:
+            glossary = build_public_glossary(source_text)
+        except Exception:
+            glossary_warning = (
+                "Summary generated, but glossary lookups failed. The plain-English "
+                "summary still ran locally."
+            )
+    record = {
+        "name": file_name,
+        "digest": file_digest,
+        "summary_html": render_summary_html(summary_text, glossary),
+        "summary_text": summary_text,
+        "lab_results": parse_lab_results(source_text),
+        "diagnostic_report": build_diagnostic_report(summary_text),
+    }
+    return record, glossary_warning
+
 
 # ─────────────────── Sidebar History ───────────────────────────────────────
-summary_html = None
 names = [f"{i + 1}. {item['name']}" for i, item in enumerate(st.session_state.history)]
-if names:  # only draw the radio once we have at least one upload
+with st.sidebar:
+    glossary_enabled = st.checkbox(
+        "Add public glossary tooltips",
+        value=False,
+        help=(
+            "Looks up short public definitions for repeated medical terms. "
+            "Only the detected terms are sent out, not the full document."
+        ),
+    )
+    st.caption(f"Ollama model: `{DEFAULT_MODEL}`")
+    st.caption(
+        "Summaries stay local as long as `OLLAMA_HOST` points to your own "
+        "Ollama server."
+    )
+
+if names:
     choice = st.sidebar.radio(
-        "History",
+        "Recent documents",
         names,
         index=st.session_state.selected or 0,
         key="history_radio",
     )
     st.session_state.selected = names.index(choice)
-    summary_html = st.session_state.history[st.session_state.selected]["summary"]
+    current_record = st.session_state.history[st.session_state.selected]
+else:
+    current_record = None
 
 # ─────────────────── PDF uploader  ───────────────────────────────────────────
-pdf_file = st.file_uploader("Upload a medical PDF", type="pdf")
+pdf_file = st.file_uploader("Upload a clinical PDF", type="pdf")
 if pdf_file:
-    # Avoid re-running on the same file
-    if pdf_file.name != st.session_state.last_file:
-        with NamedTemporaryFile(delete=False) as tmp:
-            tmp.write(pdf_file.read())
-            tmp_path = tmp.name
+    pdf_bytes = pdf_file.getvalue()
+    file_digest = hashlib.sha256(pdf_bytes).hexdigest()
+    existing_index = next(
+        (
+            index
+            for index, item in enumerate(st.session_state.history)
+            if item["digest"] == file_digest
+        ),
+        None,
+    )
 
-        text = load_text(tmp_path)
-        if not text.strip():
-            st.error("No extractable text found — try another PDF.")
+    if existing_index is not None:
+        st.session_state.selected = existing_index
+        current_record = st.session_state.history[existing_index]
+    else:
+        with NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(pdf_bytes)
+            tmp_path = Path(tmp.name)
+
+        try:
+            source_text = load_text(tmp_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+        if not source_text.strip():
+            st.error("No readable text was found in that PDF, even after OCR.")
         else:
-            # ---------------- glossary / tooltips -----------------
-            from duckduckgo_search import DDGS  # local import keeps startup fast
-
-            def build_glossary(src: str, max_terms: int = 20) -> dict[str, str]:
-                words = re.findall(r"[A-Za-z]{6,}", src.lower())
-                counts = {}
-                for w in words:
-                    if zipf_frequency(w, "en") < 4:
-                        counts[w] = counts.get(w, 0) + 1
-                common = sorted(
-                    (w for w, c in counts.items() if c >= 2),
-                    key=lambda x: -counts[x],
-                )[:max_terms]
-
-                defs: dict[str, str] = {}
-                with DDGS() as ddgs:
-                    for w in common:
-                        hits = ddgs.text(
-                            f'"{w}" definition site:nih.gov OR site:medlineplus.gov',
-                            max_results=1,
-                        )
-                        if hits:
-                            body = hits[0].get("body") or hits[0].get("snippet") or ""
-                            defs[w] = body.split(".")[0] + "..."
-                return defs
-
-            glossary = build_glossary(text)
-
-            def with_tooltips(markup: str) -> str:
-                for w, tip in glossary.items():
-                    pat = rf"\b({w})\b"
-                    rep = (
-                        rf'<span title="{tip}" '
-                        rf'style="border-bottom:1px dotted #888;cursor:help;">\1</span>'
+            with st.spinner("Summarizing document..."):
+                try:
+                    current_record, glossary_warning = build_history_record(
+                        file_name=pdf_file.name,
+                        file_digest=file_digest,
+                        source_text=source_text,
+                        glossary_enabled=glossary_enabled,
                     )
-                    markup = re.sub(pat, rep, markup, flags=re.I)
-                return markup
+                except Exception as exc:
+                    st.error(
+                        "Could not generate a summary. Make sure Ollama is running "
+                        f"and that `{DEFAULT_MODEL}` is available."
+                    )
+                    st.caption(f"Underlying error: {exc}")
+                    current_record = None
 
-            # ---------------- summarise ---------------------------
-            prompt = (
-                "Explain the following medical document in ≤200 words so a "
-                "12-year-old can understand:\n\n"
-            )
-            resp = ollama.chat(
-                model="llama3:8b",
-                messages=[{"role": "user", "content": prompt + text[:12_000]}],
-            )
-            summary_text = textwrap.fill(resp["message"]["content"], 80)
-            summary_html = with_tooltips(summary_text)
-
-            st.session_state.history.append(
-                {"name": pdf_file.name, "summary": summary_html}
-            )
-            st.session_state.selected = len(st.session_state.history) - 1
-            st.session_state.last_file = pdf_file.name
-
-            # ---------------- bar chart if labs present ------------
-            fig = build_lab_chart(text)
-            if fig:
-                st.pyplot(fig)
+            if current_record is not None:
+                st.session_state.history.append(current_record)
+                st.session_state.selected = len(st.session_state.history) - 1
+                if glossary_warning:
+                    st.info(glossary_warning)
 
 # ─────────────────── Render summary (if any) ────────────────────────────────
-if summary_html:
-    st.subheader("Summary")
-    st.markdown(summary_html, unsafe_allow_html=True)
+if current_record:
+    if current_record["lab_results"]:
+        st.subheader("Detected Lab Values")
+        st.pyplot(build_lab_chart(current_record["lab_results"]))
+
+    st.subheader("Plain-English Summary")
+    st.markdown(current_record["summary_html"], unsafe_allow_html=True)
+    st.download_button(
+        "Download FHIR DiagnosticReport JSON",
+        data=json.dumps(current_record["diagnostic_report"], indent=2),
+        file_name=f"{Path(current_record['name']).stem}-diagnostic-report.json",
+        mime="application/json",
+    )

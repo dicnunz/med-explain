@@ -25,3 +25,7 @@ def test_build_lab_chart():
         assert isinstance(fig, Figure)
     except ImportError:
         assert fig is None
+
+
+def test_build_lab_chart_with_no_results():
+    assert build_lab_chart({}) is None

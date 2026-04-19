@@ -5,6 +5,7 @@ duckduckgo-search
 wordfreq
 pytesseract
 pymupdf
+Pillow
 pytest
 matplotlib
-rich
+jsonschema
