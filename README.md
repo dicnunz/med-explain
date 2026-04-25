@@ -1,5 +1,7 @@
 # Med Explain
 
+![Med Explain synthetic clinical document flow](docs/assets/generated/med-explain-hero.png)
+
 Med Explain turns clinical PDFs into plain-English summaries on your own
 machine. It extracts text from native PDFs, falls back to OCR for scanned
 pages, uses a local Ollama model to explain the document, highlights repeated
@@ -98,3 +100,6 @@ black --check .
 pytest -q
 ```
 
+## License
+
+MIT
