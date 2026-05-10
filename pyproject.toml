@@ -1,3 +1,34 @@
+[project]
+name = "med-explain"
+version = "0.1.1"
+description = "Local-first clinical PDF explanations with OCR fallback and minimal FHIR export."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+    "PyPDF2",
+    "streamlit",
+    "ollama",
+    "duckduckgo-search",
+    "wordfreq",
+    "pytesseract",
+    "pymupdf",
+    "Pillow",
+    "matplotlib",
+    "jsonschema",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/dicnunz/med-explain"
+Funding = "https://nicdunz.gumroad.com/l/smrimu"
+"Agent Browser Operator OS" = "https://nicdunz.gumroad.com/l/agent-browser-operator-os"
+
+[tool.setuptools]
+py-modules = ["app", "explain", "fhir", "lab_utils", "loader", "summary"]
+
 [tool.black]
 line-length = 88
 target-version = ['py311']

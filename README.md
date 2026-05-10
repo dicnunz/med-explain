@@ -98,6 +98,14 @@ If this repo saves setup or prototype time, you can buy an optional
 [$5 build receipt](https://nicdunz.gumroad.com/l/smrimu). It does not unlock
 features, clinical interpretation, HIPAA support, or medical advice.
 
+A separate
+[$39 Agent Browser Operator OS](https://nicdunz.gumroad.com/l/agent-browser-operator-os)
+self-serve resource is available for people building browser-operator
+workflows. It is not required to use Med Explain and does not unlock Med
+Explain features. It does not include account access, custom setup, guaranteed
+automation, calls, clinical interpretation, HIPAA support, PHI handling,
+private document access, healthcare support, or medical advice.
+
 ## Checks
 
 ```bash
