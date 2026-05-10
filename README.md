@@ -92,6 +92,12 @@ Use [examples/synthetic-lab-report.md](examples/synthetic-lab-report.md) for a
 safe demo. It contains invented data only. Open it locally, print it to PDF,
 and upload that PDF to the app.
 
+## Support
+
+If this repo saves setup or prototype time, you can buy an optional
+[$5 build receipt](https://nicdunz.gumroad.com/l/smrimu). It does not unlock
+features, clinical interpretation, HIPAA support, or medical advice.
+
 ## Checks
 
 ```bash
