@@ -98,6 +98,15 @@ If this repo saves setup or prototype time, you can buy an optional
 [$5 build receipt](https://nicdunz.gumroad.com/l/smrimu). It does not unlock
 features, clinical interpretation, HIPAA support, or medical advice.
 
+For a written review of a redacted local prototype setup, demo flow,
+dependency surface, and safety-boundary wording, use the
+[$149 mini-audit](https://nicdunz.gumroad.com/l/agent-workflow-mini-audit).
+For a deeper written teardown of a no-PHI prototype workflow, use the
+[$750 workflow audit](https://nicdunz.gumroad.com/l/agent-workflow-audit).
+These routes do not include PHI handling, clinical interpretation, HIPAA
+support, medical advice, private document review, production healthcare
+support, account access, custom setup, or calls.
+
 A separate
 [$39 Agent Browser Operator OS](https://nicdunz.gumroad.com/l/agent-browser-operator-os)
 self-serve resource is available for people building browser-operator

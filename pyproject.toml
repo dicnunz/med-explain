@@ -1,6 +1,6 @@
 [project]
 name = "med-explain"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local-first clinical PDF explanations with OCR fallback and minimal FHIR export."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -25,6 +25,8 @@ test = ["pytest"]
 Homepage = "https://github.com/dicnunz/med-explain"
 Funding = "https://nicdunz.gumroad.com/l/smrimu"
 "Agent Browser Operator OS" = "https://nicdunz.gumroad.com/l/agent-browser-operator-os"
+"Agent Workflow Mini Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit"
+"Agent Workflow Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-audit"
 
 [tool.setuptools]
 py-modules = ["app", "explain", "fhir", "lab_utils", "loader", "summary"]
